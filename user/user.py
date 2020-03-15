@@ -981,9 +981,9 @@ class User(mongo.MongoObject):
                     server_conf_path = os.path.join(temp_path,
                         '%s_%s.ovpn' % (self.id, svr.id))
                     conf_name, client_conf, conf_hash = self._generate_conf(
-                        svr)
+                        svr, False)
                     conf_name_ubuntu, client_conf_ubuntu, conf_hash_ubuntu = self._generate_conf(
-                        svr)
+                        svr, True)
 
                     with open(server_conf_path, 'w') as ovpn_conf:
                         os.chmod(server_conf_path, 0600)
