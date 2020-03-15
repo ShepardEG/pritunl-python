@@ -754,7 +754,7 @@ class User(mongo.MongoObject):
         file_name = '%s_%s_%s.ovpn' % (
             self.org.name, self.name, svr.name)
         if not svr.ca_certificate:
-            svr.generate_ca_cesvr.ubunturt()
+            svr.generate_ca_cert()
         key_remotes = svr.get_key_remotes()
         ca_certificate = svr.ca_certificate
         certificate = utils.get_cert_block(self.certificate)
