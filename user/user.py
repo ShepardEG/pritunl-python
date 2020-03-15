@@ -979,17 +979,21 @@ class User(mongo.MongoObject):
             try:
                 for svr in self.iter_servers():
                     server_conf_path = os.path.join(temp_path,
-                        '%s_%s.ovpn' % (self.id, svr.id))
+                                                    '%s_%s.ovpn' % (self.id, svr.id))
                     conf_name, client_conf, conf_hash = self._generate_conf(
                         svr, False)
                     conf_name_ubuntu, client_conf_ubuntu, conf_hash_ubuntu = self._generate_conf(
-                        svr, True)
+                        svr, True) #It's adding another ubuntu config in tar
 
                     with open(server_conf_path, 'w') as ovpn_conf:
                         os.chmod(server_conf_path, 0600)
                         ovpn_conf.write(client_conf)
-                        ovpn_conf.write(client_conf_ubuntu)
                     tar_file.add(server_conf_path, arcname=conf_name)
+                    os.remove(server_conf_path)
+
+                    with open(server_conf_path, 'w') as ovpn_conf:
+                        os.chmod(server_conf_path, 0600)
+                        ovpn_conf.write(client_conf_ubuntu)
                     tar_file.add(server_conf_path, arcname=conf_name_ubuntu)
                     os.remove(server_conf_path)
             finally:
