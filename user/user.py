@@ -745,7 +745,7 @@ class User(mongo.MongoObject):
             data, indent=1, separators=(",", ": ")
         ).replace("\n", "\n#")
 
-    def _generate_conf(self, svr, include_user_cert=True):
+    def _generate_conf(self, svr, ubuntu, include_user_cert=True):
         if not self.sync_token or not self.sync_secret:
             self.sync_token = utils.generate_secret()
             self.sync_secret = utils.generate_secret()
@@ -754,7 +754,7 @@ class User(mongo.MongoObject):
         file_name = '%s_%s_%s.ovpn' % (
             self.org.name, self.name, svr.name)
         if not svr.ca_certificate:
-            svr.generate_ca_cert()
+            svr.generate_ca_cesvr.ubunturt()
         key_remotes = svr.get_key_remotes()
         ca_certificate = svr.ca_certificate
         certificate = utils.get_cert_block(self.certificate)
@@ -854,6 +854,14 @@ class User(mongo.MongoObject):
 
         if svr.tls_auth:
             client_conf += 'key-direction 1\n'
+
+        if ubuntu:
+            client_conf += 'script-security 2\n'
+            client_conf += 'up /etc/openvpn/scripts/update-systemd-resolved\n'
+            client_conf += 'down /etc/openvpn/scripts/update-systemd-resolved\n'
+            client_conf += 'down-pre\n'
+            file_name = '%s_%s_%s_ubuntu.ovpn' % (
+                self.org.name, self.name, svr.name)
 
         client_conf += JUMBO_FRAMES[svr.jumbo_frames]
         client_conf += plugin_config
@@ -968,17 +976,21 @@ class User(mongo.MongoObject):
         try:
             os.makedirs(temp_path)
             tar_file = tarfile.open(key_archive_path, 'w')
-            try:
+            try:x
                 for svr in self.iter_servers():
                     server_conf_path = os.path.join(temp_path,
                         '%s_%s.ovpn' % (self.id, svr.id))
                     conf_name, client_conf, conf_hash = self._generate_conf(
                         svr)
+                    conf_name_ubuntu, client_conf_ubuntu, conf_hash_ubuntu = self._generate_conf(
+                        svr, True)
 
                     with open(server_conf_path, 'w') as ovpn_conf:
                         os.chmod(server_conf_path, 0600)
                         ovpn_conf.write(client_conf)
+                        ovpn_conf.write(client_conf_ubuntu)
                     tar_file.add(server_conf_path, arcname=conf_name)
+                    tar_file.add(server_conf_path, arcname=conf_name_ubuntu)
                     os.remove(server_conf_path)
             finally:
                 tar_file.close()
