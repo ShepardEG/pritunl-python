@@ -983,7 +983,7 @@ class User(mongo.MongoObject):
                     conf_name, client_conf, conf_hash = self._generate_conf(
                         svr)
                     conf_name_ubuntu, client_conf_ubuntu, conf_hash_ubuntu = self._generate_conf(
-                        svr, True)
+                        svr)
 
                     with open(server_conf_path, 'w') as ovpn_conf:
                         os.chmod(server_conf_path, 0600)
