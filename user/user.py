@@ -976,7 +976,7 @@ class User(mongo.MongoObject):
         try:
             os.makedirs(temp_path)
             tar_file = tarfile.open(key_archive_path, 'w')
-            try:x
+            try:
                 for svr in self.iter_servers():
                     server_conf_path = os.path.join(temp_path,
                         '%s_%s.ovpn' % (self.id, svr.id))
